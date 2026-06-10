@@ -1,0 +1,384 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PrepSphere — Start Interview</title>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;400;500;600;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+    <style>
+        *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+        :root {
+            --bg: #050816; --bg2: #0a0f2e; --bg3: #0d1433;
+            --blue: #00d4ff; --purple: #7b2ff7; --pink: #ff006e;
+            --green: #00ff88; --yellow: #ffaa00; --white: #ffffff; --gray: #8892b0;
+        }
+        body {
+            font-family: 'Rajdhani', sans-serif;
+            background: var(--bg); min-height: 100vh; overflow-x: hidden;
+        }
+        .bg-stars {
+            position: fixed; inset: 0; z-index: 0;
+            background:
+                radial-gradient(600px 600px at 80% 10%, rgba(123,47,247,0.08) 0%, transparent 70%),
+                radial-gradient(500px 500px at 10% 80%, rgba(0,212,255,0.06) 0%, transparent 70%),
+                #050816;
+        }
+        .bg-grid {
+            position: fixed; inset: 0; z-index: 0;
+            background-image: linear-gradient(rgba(0,212,255,0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(0,212,255,0.03) 1px, transparent 1px);
+            background-size: 60px 60px; animation: gridPan 25s linear infinite;
+        }
+        @keyframes gridPan { to { background-position: 60px 60px; } }
+        .scanlines {
+            position: fixed; inset: 0; z-index: 2; pointer-events: none;
+            background: repeating-linear-gradient(0deg, transparent, transparent 3px, rgba(0,212,255,0.005) 3px, rgba(0,212,255,0.005) 4px);
+        }
+        .doodle-layer { position: fixed; inset: 0; z-index: 1; pointer-events: none; overflow: hidden; }
+        .doodle { position: absolute; opacity: 0; animation: doodleFloat linear infinite; }
+        @keyframes doodleFloat {
+            0% { transform: translateY(105vh) rotate(0deg); opacity: 0; }
+            6% { opacity: 1; } 50% { transform: translateY(50vh) rotate(6deg); opacity: 0.15; }
+            94% { opacity: 0.08; } 100% { transform: translateY(-5vh) rotate(-4deg); opacity: 0; }
+        }
+        .word-float {
+            position: absolute; opacity: 0; font-family: 'Share Tech Mono', monospace;
+            animation: wordUp linear infinite; pointer-events: none; white-space: nowrap;
+        }
+        @keyframes wordUp {
+            0% { transform: translateY(105vh); opacity: 0; } 8% { opacity: 1; }
+            92% { opacity: 0.5; } 100% { transform: translateY(-5vh); opacity: 0; }
+        }
+
+        /* NAV */
+        nav {
+            position: relative; z-index: 10;
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 18px 40px;
+            border-bottom: 1px solid rgba(0,212,255,0.08);
+            background: rgba(5,8,22,0.9); backdrop-filter: blur(20px);
+        }
+        .nav-logo { display: flex; align-items: center; gap: 12px; text-decoration: none; }
+        .nav-logo-badge {
+            width: 38px; height: 38px; border-radius: 10px;
+            background: linear-gradient(135deg, var(--blue), var(--purple));
+            display: flex; align-items: center; justify-content: center;
+            font-family: 'Orbitron', monospace; font-size: 0.7rem; font-weight: 900; color: white;
+            box-shadow: 0 0 15px rgba(0,212,255,0.3);
+        }
+        .nav-logo-text {
+            font-family: 'Orbitron', monospace; font-size: 1.1rem; font-weight: 900; letter-spacing: 3px;
+            background: linear-gradient(135deg, var(--blue), var(--purple));
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+        }
+        .btn-back {
+            display: flex; align-items: center; gap: 8px;
+            padding: 8px 18px; border-radius: 8px; text-decoration: none;
+            background: rgba(0,212,255,0.05); border: 1px solid rgba(0,212,255,0.15);
+            color: var(--gray); font-family: 'Share Tech Mono', monospace;
+            font-size: 0.72rem; letter-spacing: 1px; transition: all 0.3s ease;
+        }
+        .btn-back:hover { color: var(--blue); border-color: rgba(0,212,255,0.3); background: rgba(0,212,255,0.08); }
+
+        /* MAIN */
+        .main {
+            position: relative; z-index: 5;
+            max-width: 800px; margin: 0 auto;
+            padding: 60px 40px;
+        }
+
+        /* Page header */
+        .page-header { text-align: center; margin-bottom: 50px; animation: fadeDown 0.6s ease both; }
+        @keyframes fadeDown { from { opacity:0; transform:translateY(-15px); } to { opacity:1; transform:translateY(0); } }
+        .page-title {
+            font-family: 'Orbitron', monospace; font-size: 2rem; font-weight: 900;
+            background: linear-gradient(135deg, var(--blue), var(--purple));
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+            letter-spacing: 3px; margin-bottom: 10px;
+        }
+        .page-sub { font-size: 1rem; color: var(--gray); letter-spacing: 0.5px; }
+
+        /* Form card */
+        .form-card {
+            background: rgba(10,15,46,0.85);
+            border: 1px solid rgba(0,212,255,0.15);
+            border-radius: 24px; padding: 44px;
+            backdrop-filter: blur(24px); position: relative; overflow: hidden;
+            animation: fadeUp 0.6s ease 0.1s both;
+            box-shadow: 0 30px 60px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.05);
+        }
+        @keyframes fadeUp { from { opacity:0; transform:translateY(20px); } to { opacity:1; transform:translateY(0); } }
+        .form-card::before {
+            content: ''; position: absolute; top: 0; left: 10%; right: 10%; height: 1px;
+            background: linear-gradient(90deg, transparent, var(--blue), var(--purple), transparent);
+        }
+        .corner { position: absolute; width: 14px; height: 14px; }
+        .c-tl { top:12px; left:12px; border-top:2px solid var(--blue); border-left:2px solid var(--blue); }
+        .c-tr { top:12px; right:12px; border-top:2px solid var(--blue); border-right:2px solid var(--blue); }
+        .c-bl { bottom:12px; left:12px; border-bottom:2px solid var(--purple); border-left:2px solid var(--purple); }
+        .c-br { bottom:12px; right:12px; border-bottom:2px solid var(--purple); border-right:2px solid var(--purple); }
+
+        /* Section label */
+        .section-label {
+            font-family: 'Share Tech Mono', monospace; font-size: 0.7rem;
+            letter-spacing: 3px; color: var(--blue); text-transform: uppercase;
+            margin-bottom: 12px; display: flex; align-items: center; gap: 8px;
+        }
+        .section-label::after { content: ''; flex: 1; height: 1px; background: rgba(0,212,255,0.15); }
+
+        /* URL input */
+        .url-field { margin-bottom: 36px; }
+        .url-input-wrap { position: relative; }
+        .url-input-wrap .url-icon {
+            position: absolute; left: 16px; top: 50%; transform: translateY(-50%);
+            font-size: 1.1rem; pointer-events: none;
+        }
+        .url-input {
+            width: 100%; padding: 16px 16px 16px 48px;
+            background: rgba(0,212,255,0.04); border: 1px solid rgba(0,212,255,0.18);
+            border-radius: 12px; color: var(--white);
+            font-family: 'Share Tech Mono', monospace; font-size: 0.9rem;
+            outline: none; transition: all 0.3s ease;
+        }
+        .url-input::placeholder { color: rgba(136,146,176,0.4); }
+        .url-input:focus {
+            border-color: var(--blue); background: rgba(0,212,255,0.07);
+            box-shadow: 0 0 0 3px rgba(0,212,255,0.1);
+        }
+        .url-examples {
+            display: flex; gap: 8px; flex-wrap: wrap; margin-top: 10px;
+        }
+        .url-example {
+            font-family: 'Share Tech Mono', monospace; font-size: 0.65rem;
+            color: var(--gray); padding: 3px 10px;
+            background: rgba(0,212,255,0.04); border: 1px solid rgba(0,212,255,0.1);
+            border-radius: 20px; cursor: pointer; transition: all 0.2s;
+        }
+        .url-example:hover { color: var(--blue); border-color: rgba(0,212,255,0.3); }
+
+        /* Mode cards */
+        .mode-section { margin-bottom: 36px; }
+        .mode-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+        .mode-card {
+            padding: 22px 16px; border-radius: 14px; cursor: pointer;
+            border: 2px solid rgba(0,212,255,0.1);
+            background: rgba(0,212,255,0.03);
+            transition: all 0.3s ease; text-align: center; position: relative;
+        }
+        .mode-card:hover {
+            border-color: rgba(0,212,255,0.3);
+            background: rgba(0,212,255,0.06);
+            transform: translateY(-3px);
+        }
+        .mode-card.selected {
+            border-color: var(--blue);
+            background: rgba(0,212,255,0.08);
+            box-shadow: 0 0 20px rgba(0,212,255,0.15);
+        }
+        .mode-card.selected::before {
+            content: '✓';
+            position: absolute; top: 10px; right: 12px;
+            font-size: 0.75rem; color: var(--blue);
+            font-family: 'Orbitron', monospace; font-weight: 700;
+        }
+        .mode-icon { font-size: 2.2rem; margin-bottom: 10px; display: block; }
+        .mode-title {
+            font-family: 'Orbitron', monospace; font-size: 0.72rem;
+            font-weight: 700; color: var(--blue); letter-spacing: 1px;
+            text-transform: uppercase; margin-bottom: 6px;
+        }
+        .mode-desc { font-size: 0.82rem; color: var(--gray); line-height: 1.5; }
+        .mode-card[data-mode="interview"] { border-color: rgba(123,47,247,0.15); }
+        .mode-card[data-mode="interview"]:hover { border-color: rgba(123,47,247,0.4); background: rgba(123,47,247,0.06); }
+        .mode-card[data-mode="interview"].selected { border-color: var(--purple); background: rgba(123,47,247,0.08); box-shadow: 0 0 20px rgba(123,47,247,0.15); }
+        .mode-card[data-mode="interview"] .mode-title { color: #a855f7; }
+        .mode-card[data-mode="both"] { border-color: rgba(255,0,110,0.15); }
+        .mode-card[data-mode="both"]:hover { border-color: rgba(255,0,110,0.4); background: rgba(255,0,110,0.06); }
+        .mode-card[data-mode="both"].selected { border-color: var(--pink); background: rgba(255,0,110,0.08); box-shadow: 0 0 20px rgba(255,0,110,0.15); }
+        .mode-card[data-mode="both"] .mode-title { color: var(--pink); }
+
+        /* Hidden select */
+        #modeInput { display: none; }
+
+        /* Info box */
+        .info-box {
+            display: flex; gap: 12px; align-items: flex-start;
+            padding: 14px 16px; margin-bottom: 28px;
+            background: rgba(0,212,255,0.04); border: 1px solid rgba(0,212,255,0.12);
+            border-radius: 10px; transition: all 0.3s ease;
+        }
+        .info-icon { font-size: 1.1rem; flex-shrink: 0; margin-top: 2px; }
+        .info-text { font-size: 0.85rem; color: var(--gray); line-height: 1.6; }
+        .info-text strong { color: var(--blue); }
+
+        /* Submit */
+        .btn-start {
+            width: 100%; padding: 17px; border: none; border-radius: 12px;
+            background: linear-gradient(135deg, var(--blue), var(--purple));
+            color: white; font-family: 'Orbitron', monospace;
+            font-size: 0.85rem; font-weight: 700; letter-spacing: 3px;
+            text-transform: uppercase; cursor: pointer;
+            position: relative; overflow: hidden; transition: all 0.3s ease;
+            box-shadow: 0 8px 25px rgba(0,212,255,0.25);
+        }
+        .btn-start::before {
+            content: ''; position: absolute; top: 0; left: -100%; width: 100%; height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.12), transparent);
+            transition: 0.5s;
+        }
+        .btn-start:hover { transform: translateY(-2px); box-shadow: 0 12px 40px rgba(0,212,255,0.45); }
+        .btn-start:hover::before { left: 100%; }
+        .btn-start:active { transform: translateY(0); }
+        .btn-start:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }
+
+        @media (max-width: 600px) {
+            .main { padding: 30px 16px; }
+            .mode-grid { grid-template-columns: 1fr; }
+            .form-card { padding: 28px 20px; }
+            nav { padding: 16px 20px; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="bg-stars"></div>
+<div class="bg-grid"></div>
+<div class="scanlines"></div>
+<div class="doodle-layer" id="doodleLayer"></div>
+
+<!-- NAV -->
+<nav>
+    <a href="/dashboard" class="nav-logo">
+        <div class="nav-logo-badge">PS</div>
+        <div class="nav-logo-text">PREPSPHERE</div>
+    </a>
+    <a href="/dashboard" class="btn-back">← BACK TO DASHBOARD</a>
+</nav>
+
+<!-- MAIN -->
+<div class="main">
+
+    <div class="page-header">
+        <div class="page-title">START INTERVIEW</div>
+        <div class="page-sub">Paste your project URL and choose your interview mode</div>
+    </div>
+
+    <div class="form-card">
+        <div class="corner c-tl"></div>
+        <div class="corner c-tr"></div>
+        <div class="corner c-bl"></div>
+        <div class="corner c-br"></div>
+
+        <form action="/interview/start" method="POST" id="interviewForm">
+
+            <!-- URL Input -->
+            <div class="url-field">
+                <div class="section-label">Project URL</div>
+                <div class="url-input-wrap">
+                    <span class="url-icon">🔗</span>
+                    <input type="url" class="url-input" name="project_url" id="projectUrl"
+                        placeholder="https://github.com/username/repo  or  https://yourapp.onrender.com"
+                        required>
+                </div>
+                <div class="url-examples">
+                    <span class="url-example" onclick="fillUrl('https://github.com/Pooja-jaggi/medicine-tracker')">📦 MediTrack</span>
+                    <span class="url-example" onclick="fillUrl('https://github.com/Pooja-jaggi/Hostel-Leave-system-')">🏠 HostelGo</span>
+                </div>
+            </div>
+
+            <!-- Mode Selection -->
+            <div class="mode-section">
+                <div class="section-label">Interview Mode</div>
+                <div class="mode-grid">
+                    <div class="mode-card" data-mode="explain" onclick="selectMode('explain', this)">
+                        <span class="mode-icon">🧠</span>
+                        <div class="mode-title">AI Explains</div>
+                        <div class="mode-desc">AI explains your project in detail. You can interrupt and ask questions anytime.</div>
+                    </div>
+                    <div class="mode-card" data-mode="interview" onclick="selectMode('interview', this)">
+                        <span class="mode-icon">🎯</span>
+                        <div class="mode-title">Interview</div>
+                        <div class="mode-desc">AI acts as a real interviewer. Answers one question at a time with hints if stuck.</div>
+                    </div>
+                    <div class="mode-card" data-mode="both" onclick="selectMode('both', this)">
+                        <span class="mode-icon">⚡</span>
+                        <div class="mode-title">Both</div>
+                        <div class="mode-desc">AI gives a quick project summary then jumps straight into a full interview.</div>
+                    </div>
+                </div>
+                <input type="hidden" name="mode" id="modeInput">
+            </div>
+
+            <!-- Info box (changes based on mode) -->
+            <div class="info-box" id="infoBox" style="display:none;">
+                <div class="info-icon" id="infoIcon">💡</div>
+                <div class="info-text" id="infoText"></div>
+            </div>
+
+            <button type="submit" class="btn-start" id="startBtn" disabled>
+                ⚡ LAUNCH INTERVIEW
+            </button>
+        </form>
+    </div>
+</div>
+
+<script>
+    const modeInfo = {
+        explain: { icon: '🧠', text: '<strong>Explain Mode:</strong> The AI will read your project and explain it clearly — architecture, tech stack, decisions. You can stop it at any point and ask questions.' },
+        interview: { icon: '🎯', text: '<strong>Interview Mode:</strong> The AI acts as a senior engineer interviewing you about your project. It will ask one question at a time and give small hints if you get stuck.' },
+        both: { icon: '⚡', text: '<strong>Both Mode:</strong> You get a quick 3-4 line summary of your project first, then the AI immediately starts the technical interview.' }
+    };
+
+    function selectMode(mode, el) {
+        document.querySelectorAll('.mode-card').forEach(c => c.classList.remove('selected'));
+        el.classList.add('selected');
+        document.getElementById('modeInput').value = mode;
+        const info = modeInfo[mode];
+        document.getElementById('infoIcon').textContent = info.icon;
+        document.getElementById('infoText').innerHTML = info.text;
+        document.getElementById('infoBox').style.display = 'flex';
+        checkReady();
+    }
+
+    function fillUrl(url) {
+        document.getElementById('projectUrl').value = url;
+        checkReady();
+    }
+
+    document.getElementById('projectUrl').addEventListener('input', checkReady);
+
+    function checkReady() {
+        const url = document.getElementById('projectUrl').value.trim();
+        const mode = document.getElementById('modeInput').value;
+        document.getElementById('startBtn').disabled = !(url && mode);
+    }
+
+    // Floating doodles + words
+    const layer = document.getElementById('doodleLayer');
+    const words = ['Python','Flask','DSA','SQL','Arrays','React','Node.js','API','Git','OS','DBMS','Recursion','Sorting','JavaScript','REST','JWT','Stack','Queue','Graphs','Trees'];
+    const wordColors = ['rgba(0,212,255,','rgba(123,47,247,','rgba(0,255,136,','rgba(255,0,110,'];
+    words.forEach(word => {
+        const el = document.createElement('div');
+        el.className = 'word-float';
+        el.textContent = word;
+        const color = wordColors[Math.floor(Math.random() * wordColors.length)];
+        el.style.cssText = `left:${Math.random()*100}vw;font-size:${Math.random()*10+9}px;color:${color}${(Math.random()*0.3+0.1).toFixed(2)});animation-duration:${Math.random()*12+12}s;animation-delay:${Math.random()*15}s;`;
+        layer.appendChild(el);
+    });
+    const doodles = [
+        { color:'#00d4ff', html:`<svg width="60" height="50" viewBox="0 0 24 20" fill="none" stroke="#00d4ff" stroke-width="1.2" stroke-linecap="round"><rect x="2" y="2" width="20" height="13" rx="2"/><text x="7" y="12" font-size="5" fill="#00d4ff" font-family="monospace" stroke="none">&lt;/&gt;</text><path d="M0,17 Q2,15 5,15 L19,15 Q22,15 24,17 Z" fill="rgba(0,212,255,0.1)" stroke="#00d4ff"/></svg>` },
+        { color:'#a855f7', html:`<svg width="58" height="50" viewBox="0 0 24 20" fill="none" stroke="#a855f7" stroke-width="1.2" stroke-linecap="round"><rect x="1" y="1" width="22" height="18" rx="2"/><line x1="1" y1="5" x2="23" y2="5"/><circle cx="4" cy="3" r="0.8" fill="#ff006e" stroke="none"/><circle cx="7" cy="3" r="0.8" fill="#ffaa00" stroke="none"/><circle cx="10" cy="3" r="0.8" fill="#00ff88" stroke="none"/><polyline points="4,10 7,13 4,16"/><line x1="9" y1="16" x2="16" y2="16"/></svg>` },
+        { color:'#ff006e', html:`<svg width="55" height="45" viewBox="0 0 24 18" fill="none" stroke="#ff006e" stroke-width="2" stroke-linecap="round"><polyline points="16,2 22,9 16,16"/><polyline points="8,2 2,9 8,16"/></svg>` },
+        { color:'#00ff88', html:`<svg width="48" height="55" viewBox="0 0 18 22" fill="none" stroke="#00ff88" stroke-width="1.2" stroke-linecap="round"><ellipse cx="9" cy="4" rx="7" ry="2.5"/><path d="M2,4 v5 Q2,11.5 9,11.5 Q16,11.5 16,9 V4"/><path d="M2,9 v5 Q2,16.5 9,16.5 Q16,16.5 16,14 V9"/><path d="M2,14 v4 Q2,20.5 9,20.5 Q16,20.5 16,18 V14"/></svg>` },
+        { color:'#ffaa00', html:`<svg width="50" height="50" viewBox="0 0 22 22" fill="none" stroke="#ffaa00" stroke-width="1.2" stroke-linecap="round"><polygon points="11,2 13.8,8 20,8.7 15.5,13 17,19.5 11,16.2 5,19.5 6.5,13 2,8.7 8.2,8"/></svg>` },
+        { color:'#00ff88', html:`<svg width="45" height="58" viewBox="0 0 16 22" fill="none" stroke="#00ff88" stroke-width="1.2" stroke-linecap="round"><rect x="5" y="1" width="6" height="10" rx="3"/><path d="M2,10 Q2,16 8,16 Q14,16 14,10"/><line x1="8" y1="16" x2="8" y2="20"/><line x1="5" y1="20" x2="11" y2="20"/></svg>` },
+    ];
+    doodles.forEach(d => {
+        const el = document.createElement('div');
+        el.className = 'doodle';
+        el.innerHTML = d.html;
+        el.style.cssText = `left:${Math.random()*95}vw;animation-duration:${Math.random()*14+14}s;animation-delay:${Math.random()*15}s;filter:drop-shadow(0 0 8px ${d.color}55);`;
+        layer.appendChild(el);
+    });
+</script>
+</body>
+</html>

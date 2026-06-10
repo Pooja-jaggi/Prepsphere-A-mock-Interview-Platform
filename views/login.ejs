@@ -1,0 +1,721 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PrepSphere — Login</title>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;400;500;600;700&family=Share+Tech+Mono&display=swap"
+        rel="stylesheet">
+    <style>
+        *,
+        *::before,
+        *::after {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --bg: #050816;
+            --bg2: #0a0f2e;
+            --blue: #00d4ff;
+            --purple: #7b2ff7;
+            --pink: #ff006e;
+            --green: #00ff88;
+            --yellow: #ffaa00;
+            --white: #ffffff;
+            --gray: #8892b0;
+        }
+
+        body {
+            font-family: 'Rajdhani', sans-serif;
+            background: var(--bg);
+            min-height: 100vh;
+            overflow-x: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .bg-stars {
+            position: fixed;
+            inset: 0;
+            z-index: 0;
+            background:
+                radial-gradient(600px 600px at 80% 10%, rgba(123, 47, 247, 0.1) 0%, transparent 70%),
+                radial-gradient(500px 500px at 10% 80%, rgba(0, 212, 255, 0.08) 0%, transparent 70%),
+                #050816;
+        }
+
+        .bg-grid {
+            position: fixed;
+            inset: 0;
+            z-index: 0;
+            background-image:
+                linear-gradient(rgba(0, 212, 255, 0.04) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0, 212, 255, 0.04) 1px, transparent 1px);
+            background-size: 60px 60px;
+            animation: gridPan 25s linear infinite;
+        }
+
+        @keyframes gridPan {
+            to {
+                background-position: 60px 60px;
+            }
+        }
+
+        .scanlines {
+            position: fixed;
+            inset: 0;
+            z-index: 2;
+            pointer-events: none;
+            background: repeating-linear-gradient(0deg, transparent, transparent 3px, rgba(0, 212, 255, 0.006) 3px, rgba(0, 212, 255, 0.006) 4px);
+        }
+
+        .doodle-layer {
+            position: fixed;
+            inset: 0;
+            z-index: 1;
+            pointer-events: none;
+            overflow: hidden;
+        }
+
+        .doodle {
+            position: absolute;
+            opacity: 0;
+            animation: doodleFloat linear infinite;
+        }
+
+        @keyframes doodleFloat {
+            0% {
+                transform: translateY(105vh) rotate(0deg);
+                opacity: 0;
+            }
+
+            6% {
+                opacity: 1;
+            }
+
+            50% {
+                transform: translateY(50vh) rotate(6deg);
+                opacity: 0.2;
+            }
+
+            94% {
+                opacity: 0.12;
+            }
+
+            100% {
+                transform: translateY(-5vh) rotate(-4deg);
+                opacity: 0;
+            }
+        }
+
+        .word-float {
+            position: absolute;
+            opacity: 0;
+            font-family: 'Share Tech Mono', monospace;
+            animation: wordUp linear infinite;
+            pointer-events: none;
+            white-space: nowrap;
+        }
+
+        @keyframes wordUp {
+            0% {
+                transform: translateY(105vh);
+                opacity: 0;
+            }
+
+            8% {
+                opacity: 1;
+            }
+
+            92% {
+                opacity: 0.6;
+            }
+
+            100% {
+                transform: translateY(-5vh);
+                opacity: 0;
+            }
+        }
+
+        .page {
+            position: relative;
+            z-index: 10;
+            width: 100%;
+            max-width: 480px;
+            padding: 20px;
+        }
+
+        .logo-wrap {
+            text-align: center;
+            margin-bottom: 24px;
+            animation: fadeDown 0.8s ease both;
+        }
+
+        @keyframes fadeDown {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .card {
+            background: rgba(10, 15, 46, 0.85);
+            border: 1px solid rgba(0, 212, 255, 0.15);
+            border-radius: 24px;
+            padding: 40px 36px;
+            backdrop-filter: blur(24px);
+            position: relative;
+            overflow: hidden;
+            animation: fadeUp 0.8s ease 0.2s both;
+            box-shadow: 0 30px 60px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.05);
+        }
+
+        @keyframes fadeUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 10%;
+            right: 10%;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, var(--blue), var(--purple), transparent);
+        }
+
+        .card::after {
+            content: '';
+            position: absolute;
+            top: -40%;
+            left: -20%;
+            width: 140%;
+            height: 100%;
+            background: radial-gradient(ellipse at 50% 0%, rgba(0, 212, 255, 0.04) 0%, transparent 60%);
+            pointer-events: none;
+        }
+
+        .corner {
+            position: absolute;
+            width: 14px;
+            height: 14px;
+        }
+
+        .c-tl {
+            top: 12px;
+            left: 12px;
+            border-top: 2px solid var(--blue);
+            border-left: 2px solid var(--blue);
+        }
+
+        .c-tr {
+            top: 12px;
+            right: 12px;
+            border-top: 2px solid var(--blue);
+            border-right: 2px solid var(--blue);
+        }
+
+        .c-bl {
+            bottom: 12px;
+            left: 12px;
+            border-bottom: 2px solid var(--purple);
+            border-left: 2px solid var(--purple);
+        }
+
+        .c-br {
+            bottom: 12px;
+            right: 12px;
+            border-bottom: 2px solid var(--purple);
+            border-right: 2px solid var(--purple);
+        }
+
+        .card-title {
+            font-family: 'Orbitron', monospace;
+            font-size: 1.3rem;
+            font-weight: 700;
+            letter-spacing: 2px;
+            color: var(--white);
+            margin-bottom: 6px;
+        }
+
+        .card-sub {
+            font-size: 0.95rem;
+            color: var(--gray);
+            margin-bottom: 28px;
+        }
+
+        .field {
+            margin-bottom: 20px;
+        }
+
+        .field label {
+            display: block;
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 0.68rem;
+            letter-spacing: 2.5px;
+            color: var(--blue);
+            margin-bottom: 8px;
+            text-transform: uppercase;
+        }
+
+        .field input {
+            width: 100%;
+            padding: 13px 16px;
+            background: rgba(0, 212, 255, 0.04);
+            border: 1px solid rgba(0, 212, 255, 0.18);
+            border-radius: 10px;
+            color: var(--white);
+            font-family: 'Rajdhani', sans-serif;
+            font-size: 1rem;
+            font-weight: 500;
+            outline: none;
+            transition: all 0.3s ease;
+        }
+
+        .field input::placeholder {
+            color: rgba(136, 146, 176, 0.45);
+        }
+
+        .field input:focus {
+            border-color: var(--blue);
+            background: rgba(0, 212, 255, 0.07);
+            box-shadow: 0 0 0 3px rgba(0, 212, 255, 0.1);
+        }
+
+        .btn-login {
+            width: 100%;
+            padding: 15px;
+            margin-top: 6px;
+            border: none;
+            border-radius: 10px;
+            background: linear-gradient(135deg, var(--blue), var(--purple));
+            color: var(--white);
+            font-family: 'Orbitron', monospace;
+            font-size: 0.8rem;
+            font-weight: 700;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.3s ease;
+            box-shadow: 0 8px 25px rgba(0, 212, 255, 0.25);
+        }
+
+        .btn-login::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.12), transparent);
+            transition: 0.5s;
+        }
+
+        .btn-login:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 40px rgba(0, 212, 255, 0.45);
+        }
+
+        .btn-login:hover::before {
+            left: 100%;
+        }
+
+        .btn-login:active {
+            transform: translateY(0);
+        }
+
+        .error-msg {
+            background: rgba(255, 60, 60, 0.15);
+            border: 1px solid #ff3c3c;
+            color: #ff6b6b;
+            padding: 10px 16px;
+            border-radius: 8px;
+            margin-bottom: 16px;
+            font-size: 0.9rem;
+        }
+
+        .divider {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin: 20px 0;
+        }
+
+        .div-line {
+            flex: 1;
+            height: 1px;
+            background: rgba(0, 212, 255, 0.1);
+        }
+
+        .div-text {
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 0.65rem;
+            color: var(--gray);
+            letter-spacing: 2px;
+        }
+
+        .links {
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .links p {
+            font-size: 0.9rem;
+            color: var(--gray);
+        }
+
+        .links a {
+            color: var(--blue);
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.2s;
+        }
+
+        .links a:hover {
+            color: var(--purple);
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="bg-stars"></div>
+    <div class="bg-grid"></div>
+    <div class="scanlines"></div>
+    <div class="doodle-layer" id="doodleLayer"></div>
+
+    <div class="page">
+
+        <!-- LOGO -->
+        <div class="logo-wrap">
+            <svg width="100%" viewBox="0 0 680 310" role="img" xmlns="http://www.w3.org/2000/svg">
+                <defs>
+                    <style>
+                        @keyframes pulse {
+
+                            0%,
+                            100% {
+                                opacity: 0.8;
+                                transform: scale(1)
+                            }
+
+                            50% {
+                                opacity: 1;
+                                transform: scale(1.03)
+                            }
+                        }
+
+                        @keyframes dot1 {
+
+                            0%,
+                            100% {
+                                opacity: 0.3
+                            }
+
+                            50% {
+                                opacity: 1
+                            }
+                        }
+
+                        @keyframes dot2 {
+
+                            0%,
+                            100% {
+                                opacity: 0.2
+                            }
+
+                            60% {
+                                opacity: 1
+                            }
+                        }
+
+                        @keyframes dot3 {
+
+                            0%,
+                            100% {
+                                opacity: 0.4
+                            }
+
+                            40% {
+                                opacity: 1
+                            }
+                        }
+
+                        @keyframes traceFlow {
+                            0% {
+                                stroke-dashoffset: 100
+                            }
+
+                            100% {
+                                stroke-dashoffset: 0
+                            }
+                        }
+
+                        .brain-group {
+                            animation: pulse 3s ease-in-out infinite;
+                            transform-origin: 170px 155px
+                        }
+
+                        .trace1 {
+                            stroke-dasharray: 30;
+                            animation: traceFlow 2s linear infinite
+                        }
+
+                        .trace2 {
+                            stroke-dasharray: 25;
+                            animation: traceFlow 2.5s linear infinite 0.5s
+                        }
+
+                        .trace3 {
+                            stroke-dasharray: 20;
+                            animation: traceFlow 1.8s linear infinite 1s
+                        }
+
+                        .nd1 {
+                            animation: dot1 2s ease-in-out infinite
+                        }
+
+                        .nd2 {
+                            animation: dot2 2.5s ease-in-out infinite 0.3s
+                        }
+
+                        .nd3 {
+                            animation: dot3 1.8s ease-in-out infinite 0.8s
+                        }
+                    </style>
+                    <linearGradient id="bgL" x1="0%" y1="0%" x2="100%" y2="100%">
+                        <stop offset="0%" style="stop-color:#050816" />
+                        <stop offset="100%" style="stop-color:#0a0f2e" />
+                    </linearGradient>
+                    <linearGradient id="grad1L" x1="0%" y1="0%" x2="100%" y2="100%">
+                        <stop offset="0%" style="stop-color:#00d4ff" />
+                        <stop offset="100%" style="stop-color:#7b2ff7" />
+                    </linearGradient>
+                    <linearGradient id="grad2L" x1="0%" y1="0%" x2="100%" y2="0%">
+                        <stop offset="0%" style="stop-color:#00d4ff" />
+                        <stop offset="50%" style="stop-color:#7b2ff7" />
+                        <stop offset="100%" style="stop-color:#ff006e" />
+                    </linearGradient>
+                    <linearGradient id="brainFillL" x1="0%" y1="0%" x2="100%" y2="100%">
+                        <stop offset="0%" style="stop-color:#00d4ff;stop-opacity:0.12" />
+                        <stop offset="100%" style="stop-color:#7b2ff7;stop-opacity:0.08" />
+                    </linearGradient>
+                    <linearGradient id="brainFill2L" x1="0%" y1="0%" x2="100%" y2="100%">
+                        <stop offset="0%" style="stop-color:#7b2ff7;stop-opacity:0.1" />
+                        <stop offset="100%" style="stop-color:#00d4ff;stop-opacity:0.05" />
+                    </linearGradient>
+                </defs>
+                <rect width="680" height="310" fill="url(#bgL)" rx="16" />
+                <g stroke="#00d4ff" stroke-opacity="0.035" stroke-width="1">
+                    <line x1="0" y1="60" x2="680" y2="60" />
+                    <line x1="0" y1="120" x2="680" y2="120" />
+                    <line x1="0" y1="180" x2="680" y2="180" />
+                    <line x1="0" y1="240" x2="680" y2="240" />
+                    <line x1="80" y1="0" x2="80" y2="310" />
+                    <line x1="160" y1="0" x2="160" y2="310" />
+                    <line x1="240" y1="0" x2="240" y2="310" />
+                    <line x1="320" y1="0" x2="320" y2="310" />
+                    <line x1="400" y1="0" x2="400" y2="310" />
+                    <line x1="480" y1="0" x2="480" y2="310" />
+                    <line x1="560" y1="0" x2="560" y2="310" />
+                </g>
+                <circle cx="170" cy="155" r="100" fill="#00d4ff" fill-opacity="0.04" />
+                <circle cx="170" cy="155" r="60" fill="#7b2ff7" fill-opacity="0.06" />
+                <g transform="translate(6,6)" opacity="0.3">
+                    <path
+                        d="M170,72 C148,68 122,72 108,85 C94,98 90,116 92,132 C84,142 82,158 86,172 C90,186 100,196 112,202 C114,216 122,228 136,234 C150,240 164,238 170,236 C176,238 190,240 204,234 C218,228 226,216 228,202 C240,196 250,186 254,172 C258,158 256,142 248,132 C250,116 246,98 232,85 C218,72 192,68 170,72Z"
+                        fill="#7b2ff7" fill-opacity="0.2" stroke="none" />
+                </g>
+                <g class="brain-group">
+                    <path
+                        d="M170,72 C148,68 122,72 108,85 C94,98 90,116 92,132 C84,142 82,158 86,172 C90,186 100,196 112,202 C114,216 122,228 136,234 C148,238 162,237 170,236"
+                        fill="url(#brainFillL)" stroke="#00d4ff" stroke-width="1.8" stroke-opacity="0.85" />
+                    <path d="M115,95 C108,102 105,112 110,120" fill="none" stroke="#00d4ff" stroke-width="1"
+                        stroke-opacity="0.5" />
+                    <path d="M108,125 C102,133 102,143 108,150" fill="none" stroke="#00d4ff" stroke-width="1"
+                        stroke-opacity="0.5" />
+                    <path d="M110,158 C104,166 104,176 110,182" fill="none" stroke="#00d4ff" stroke-width="1"
+                        stroke-opacity="0.5" />
+                    <path d="M118,188 C113,196 114,206 120,212" fill="none" stroke="#00d4ff" stroke-width="1"
+                        stroke-opacity="0.4" />
+                    <path d="M130,105 C124,112 122,122 128,130" fill="none" stroke="#00d4ff" stroke-width="0.8"
+                        stroke-opacity="0.4" />
+                    <path d="M128,145 C122,153 122,163 128,170" fill="none" stroke="#00d4ff" stroke-width="0.8"
+                        stroke-opacity="0.4" />
+                    <path d="M125,175 C120,183 120,193 126,200" fill="none" stroke="#00d4ff" stroke-width="0.8"
+                        stroke-opacity="0.4" />
+                    <circle class="nd1" cx="105" cy="128" r="3.5" fill="#00d4ff" fill-opacity="0.9" />
+                    <circle class="nd2" cx="100" cy="158" r="3" fill="#00d4ff" fill-opacity="0.7" />
+                    <circle class="nd3" cx="108" cy="186" r="3.5" fill="#00ff88" fill-opacity="0.8" />
+                    <circle class="nd1" cx="120" cy="210" r="2.5" fill="#00d4ff" fill-opacity="0.6" />
+                    <path
+                        d="M170,72 C192,68 218,72 232,85 C246,98 250,116 248,132 C256,142 258,158 254,172 C250,186 240,196 228,202 C226,216 218,228 204,234 C192,238 178,237 170,236"
+                        fill="url(#brainFill2L)" stroke="#7b2ff7" stroke-width="1.8" stroke-opacity="0.85" />
+                    <g stroke="#7b2ff7" stroke-width="1.3" fill="none" stroke-opacity="0.8">
+                        <polyline points="175,90 192,90 192,100 220,100" class="trace1" />
+                        <polyline points="175,112 188,112 188,120 224,120" class="trace2" />
+                        <polyline points="175,135 195,135 195,143 235,143" class="trace3" />
+                        <polyline points="175,158 190,158 190,166 228,166" class="trace1" />
+                        <polyline points="175,180 188,180 188,188 222,188" class="trace2" />
+                        <polyline points="175,202 185,202 185,210 215,210" class="trace3" />
+                        <line x1="192" y1="100" x2="192" y2="112" stroke-opacity="0.35" />
+                        <line x1="188" y1="120" x2="188" y2="135" stroke-opacity="0.35" />
+                        <line x1="195" y1="143" x2="195" y2="158" stroke-opacity="0.35" />
+                        <line x1="190" y1="166" x2="190" y2="180" stroke-opacity="0.35" />
+                        <line x1="188" y1="188" x2="188" y2="202" stroke-opacity="0.35" />
+                    </g>
+                    <rect x="218" y="97" width="6" height="6" fill="#a855f7" rx="1" fill-opacity="0.9" />
+                    <rect x="222" y="117" width="6" height="6" fill="#7b2ff7" rx="1" fill-opacity="0.9" />
+                    <rect x="233" y="140" width="6" height="6" fill="#a855f7" rx="1" fill-opacity="0.9" />
+                    <rect x="226" y="163" width="6" height="6" fill="#7b2ff7" rx="1" fill-opacity="0.9" />
+                    <rect x="220" y="185" width="6" height="6" fill="#a855f7" rx="1" fill-opacity="0.9" />
+                    <rect x="213" y="207" width="6" height="6" fill="#ff006e" rx="1" fill-opacity="0.9" />
+                    <circle class="nd3" cx="195" cy="143" r="4" fill="#ff006e" />
+                    <circle class="nd1" cx="190" cy="166" r="3.5" fill="#00d4ff" />
+                    <circle class="nd2" cx="188" cy="112" r="3" fill="#7b2ff7" />
+                    <line x1="170" y1="72" x2="170" y2="236" stroke="url(#grad2L)" stroke-width="1.2"
+                        stroke-opacity="0.6" stroke-dasharray="5,3" />
+                    <ellipse cx="170" cy="248" rx="45" ry="6" fill="#7b2ff7" fill-opacity="0.15" />
+                    <path d="M158,236 C158,248 163,255 170,257 C177,255 182,248 182,236" fill="#0a0f2e"
+                        stroke="url(#grad1L)" stroke-width="1.5" stroke-opacity="0.7" />
+                </g>
+                <text x="295" y="125" font-family="'Courier New', monospace" font-size="52" font-weight="900"
+                    fill="url(#grad1L)" letter-spacing="3">PREP</text>
+                <text x="295" y="182" font-family="'Courier New', monospace" font-size="52" font-weight="900"
+                    fill="#7b2ff7" letter-spacing="2">SPHERE</text>
+                <rect x="293" y="196" width="320" height="1.5" fill="url(#grad2L)" rx="1" />
+                <text x="295" y="218" font-family="'Courier New', monospace" font-size="11" fill="#00d4ff"
+                    letter-spacing="3.5" fill-opacity="0.75">AI · MOCK · INTERVIEWS</text>
+                <polyline points="30,18 18,18 18,30" fill="none" stroke="#00d4ff" stroke-width="1.5"
+                    stroke-opacity="0.5" />
+                <polyline points="650,18 662,18 662,30" fill="none" stroke="#00d4ff" stroke-width="1.5"
+                    stroke-opacity="0.5" />
+                <polyline points="30,292 18,292 18,280" fill="none" stroke="#00d4ff" stroke-width="1.5"
+                    stroke-opacity="0.5" />
+                <polyline points="650,292 662,292 662,280" fill="none" stroke="#00d4ff" stroke-width="1.5"
+                    stroke-opacity="0.5" />
+            </svg>
+        </div>
+
+        <div class="card">
+            <div class="corner c-tl"></div>
+            <div class="corner c-tr"></div>
+            <div class="corner c-bl"></div>
+            <div class="corner c-br"></div>
+
+            <div class="card-title">WELCOME BACK</div>
+            <div class="card-sub">Sign in to continue your interview prep</div>
+            <% if (error==='incorrect' ) { %>
+                <div class="error-msg">❌ Incorrect password. Please try again.</div>
+                <% } else if (error==='notfound' ) { %>
+                    <div class="error-msg">❌ No account found with that email.</div>
+                    <% } %>
+                        <form action="/login" method="POST">
+                            <div class="field">
+                                <label for="email">Email Address</label>
+                                <input type="email" id="email" name="email" placeholder="your@email.com" required
+                                    autocomplete="email">
+                            </div>
+                            <div class="field">
+                                <label for="password">Password</label>
+                                <input type="password" id="password" name="password" placeholder="••••••••" required
+                                    autocomplete="current-password">
+                            </div>
+                            <button type="submit" class="btn-login">SIGN IN →</button>
+                        </form>
+
+                        <div class="divider">
+                            <div class="div-line"></div>
+                            <div class="div-text">OR</div>
+                            <div class="div-line"></div>
+                        </div>
+
+                        <div class="links">
+                            <p>Don't have an account? <a href="/register">Create Account</a></p>
+                            <p><a href="/forgot-password">Forgot your password?</a></p>
+                        </div>
+        </div>
+    </div>
+
+    <script>
+        const layer = document.getElementById('doodleLayer');
+
+        // Floating tech words
+        const words = [
+            'Python', 'Flask', 'DSA', 'SQL', 'Arrays', 'LinkedList', 'React',
+            'Node.js', 'MongoDB', 'API', 'Git', 'Docker', 'OS', 'DBMS',
+            'Networks', 'Recursion', 'Sorting', 'Graphs', 'Trees', 'Binary Search',
+            'JavaScript', 'CSS', 'HTML', 'REST', 'JWT', 'Algorithms', 'Pointers',
+            'Stack', 'Queue', 'HashMap', 'O(n)', 'OOP', 'MVC', 'Complexity'
+        ];
+        const wordColors = [
+            'rgba(0,212,255,', 'rgba(123,47,247,',
+            'rgba(0,255,136,', 'rgba(255,0,110,'
+        ];
+        words.forEach(word => {
+            const el = document.createElement('div');
+            el.className = 'word-float';
+            el.textContent = word;
+            const color = wordColors[Math.floor(Math.random() * wordColors.length)];
+            el.style.cssText = `
+            left: ${Math.random() * 100}vw;
+            font-size: ${Math.random() * 10 + 9}px;
+            color: ${color}${(Math.random() * 0.35 + 0.15).toFixed(2)});
+            animation-duration: ${Math.random() * 12 + 12}s;
+            animation-delay: ${Math.random() * 15}s;
+        `;
+            layer.appendChild(el);
+        });
+
+        // Floating doodles
+        const doodles = [
+            { color: '#00d4ff', html: `<svg width="60" height="50" viewBox="0 0 24 20" fill="none" stroke="#00d4ff" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="13" rx="2"/><text x="7" y="12" font-size="5" fill="#00d4ff" font-family="monospace" stroke="none">&lt;/&gt;</text><path d="M0,17 Q2,15 5,15 L19,15 Q22,15 24,17 Z" fill="rgba(0,212,255,0.1)" stroke="#00d4ff"/></svg>` },
+            { color: '#a855f7', html: `<svg width="58" height="50" viewBox="0 0 24 20" fill="none" stroke="#a855f7" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="1" width="22" height="18" rx="2"/><line x1="1" y1="5" x2="23" y2="5"/><circle cx="4" cy="3" r="0.8" fill="#ff006e" stroke="none"/><circle cx="7" cy="3" r="0.8" fill="#ffaa00" stroke="none"/><circle cx="10" cy="3" r="0.8" fill="#00ff88" stroke="none"/><polyline points="4,10 7,13 4,16" stroke="#a855f7"/><line x1="9" y1="16" x2="16" y2="16" stroke="#a855f7"/></svg>` },
+            { color: '#ff006e', html: `<svg width="55" height="45" viewBox="0 0 24 18" fill="none" stroke="#ff006e" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="16,2 22,9 16,16"/><polyline points="8,2 2,9 8,16"/><line x1="14" y1="2" x2="10" y2="16" stroke-opacity="0.5"/></svg>` },
+            { color: '#00ff88', html: `<svg width="48" height="55" viewBox="0 0 18 22" fill="none" stroke="#00ff88" stroke-width="1.2" stroke-linecap="round"><ellipse cx="9" cy="4" rx="7" ry="2.5"/><path d="M2,4 v5 Q2,11.5 9,11.5 Q16,11.5 16,9 V4"/><path d="M2,9 v5 Q2,16.5 9,16.5 Q16,16.5 16,14 V9"/><path d="M2,14 v4 Q2,20.5 9,20.5 Q16,20.5 16,18 V14"/></svg>` },
+            { color: '#a855f7', html: `<svg width="55" height="55" viewBox="0 0 22 22" fill="none" stroke="#a855f7" stroke-width="1.1" stroke-linecap="round"><rect x="6" y="6" width="10" height="10" rx="1.5"/><line x1="8" y1="6" x2="8" y2="3"/><line x1="11" y1="6" x2="11" y2="3"/><line x1="14" y1="6" x2="14" y2="3"/><line x1="8" y1="16" x2="8" y2="19"/><line x1="11" y1="16" x2="11" y2="19"/><line x1="14" y1="16" x2="14" y2="19"/><line x1="3" y1="8" x2="6" y2="8"/><line x1="3" y1="11" x2="6" y2="11"/><line x1="3" y1="14" x2="6" y2="14"/><line x1="16" y1="8" x2="19" y2="8"/><line x1="16" y1="11" x2="19" y2="11"/><line x1="16" y1="14" x2="19" y2="14"/><rect x="9" y="9" width="4" height="4" rx="0.5" fill="rgba(168,85,247,0.3)"/></svg>` },
+            { color: '#00d4ff', html: `<svg width="48" height="58" viewBox="0 0 16 20" fill="none" stroke="#00d4ff" stroke-width="1.2" stroke-linecap="round"><circle cx="5" cy="4" r="2"/><circle cx="5" cy="16" r="2"/><circle cx="12" cy="7" r="2"/><line x1="5" y1="6" x2="5" y2="14"/><path d="M5,6 Q5,4 12,7"/></svg>` },
+            { color: '#00d4ff', html: `<svg width="65" height="55" viewBox="0 0 26 20" fill="none" stroke="#00d4ff" stroke-width="1.2" stroke-linecap="round"><path d="M20,12 A5,5,0,0,0,10,9 A4,4,0,0,0,6,13 L20,13 Z"/><line x1="13" y1="16" x2="13" y2="20"/><polyline points="10,18 13,15 16,18"/></svg>` },
+            { color: '#ffaa00', html: `<svg width="50" height="50" viewBox="0 0 22 22" fill="none" stroke="#ffaa00" stroke-width="1.2" stroke-linecap="round"><polygon points="11,2 13.8,8 20,8.7 15.5,13 17,19.5 11,16.2 5,19.5 6.5,13 2,8.7 8.2,8"/></svg>` },
+            { color: '#ff006e', html: `<svg width="55" height="48" viewBox="0 0 22 18" fill="none" stroke="#ff006e" stroke-width="1.2" stroke-linecap="round"><path d="M1,7 Q11,-2 21,7"/><path d="M4,10 Q11,4 18,10"/><path d="M7,13 Q11,9 15,13"/><circle cx="11" cy="16" r="1.5" fill="#ff006e" stroke="none"/></svg>` },
+            { color: '#00ff88', html: `<svg width="45" height="58" viewBox="0 0 16 22" fill="none" stroke="#00ff88" stroke-width="1.2" stroke-linecap="round"><rect x="5" y="1" width="6" height="10" rx="3"/><path d="M2,10 Q2,16 8,16 Q14,16 14,10"/><line x1="8" y1="16" x2="8" y2="20"/><line x1="5" y1="20" x2="11" y2="20"/></svg>` },
+        ];
+
+        doodles.forEach(d => {
+            const el = document.createElement('div');
+            el.className = 'doodle';
+            el.innerHTML = d.html;
+            el.style.cssText = `
+            left: ${Math.random() * 95}vw;
+            animation-duration: ${Math.random() * 14 + 14}s;
+            animation-delay: ${Math.random() * 15}s;
+            filter: drop-shadow(0 0 8px ${d.color}66);
+        `;
+            layer.appendChild(el);
+        });
+    </script>
+</body>
+
+</html>
