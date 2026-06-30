@@ -1041,6 +1041,8 @@
     const input = document.getElementById('msgInput');
     const text = input.value.trim();
     if (!text) return;
+    stopSpeaking();
+    stopRecording();
 
     input.value = '';
     input.style.height = 'auto';
@@ -1204,6 +1206,7 @@
   // ── VOICE INPUT (Speech to Text) ──
   let recognition = null;
   let isRecording = false;
+  let finalTranscript ='';
 
   function toggleVoice() {
     if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) {
@@ -1219,8 +1222,8 @@
   }
 
   function startRecording() {
-    stopSpeaking(); // stop AI speaking when user starts talking
-
+    stopSpeaking();
+    finalTranscript=document.getElementById('msgInput').value || '';
     const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
     recognition = new SpeechRecognition();
     recognition.continuous    = true;
@@ -1234,39 +1237,54 @@
     };
 
     recognition.onresult = (event) => {
-      let transcript = '';
+      let interim = '';
       for (let i = event.resultIndex; i < event.results.length; i++) {
-        transcript += event.results[i][0].transcript;
+        const result=event.results[i];
+        if(result.isFinal){
+          finalTranscript +=result[0].transcript + ' ';
+        }else{
+          interim += result[0].transcript
+        }
       }
-      document.getElementById('msgInput').value = transcript;
-      // auto resize
       const ta = document.getElementById('msgInput');
-      ta.style.height = 'auto';
-      ta.style.height = Math.min(ta.scrollHeight, 120) + 'px';
+      ta.value=finalTranscript + interim;
+      ta.style.height='auto';
+      ta.style.height = Math.min(ta.scrollHeight, 120)+ 'px';
     };
-
-    recognition.onerror = () => { stopRecording(); };
-    recognition.onend   = () => { if (isRecording) stopRecording(); };
-
+    recognition.onerror = (e) =>{
+      if(e.error === 'no-speech'){
+        if (isRecording){
+          recognition.stop();
+          recognition.start();
+        }
+        return;
+      }
+      stopRecording();
+    };
+    recognition.onend = () => {
+      if(isRecording){
+        try{recognition.start(); }catch(e){}
+      }
+    };
     recognition.start();
   }
-
   function stopRecording() {
     isRecording = false;
-    if (recognition) recognition.stop();
-    document.getElementById('micBtn').classList.remove('recording');
-    document.getElementById('msgInput').placeholder = 'Type your answer here…';
-  }
+    finalTranscript='';
+    if(recognition){
+      recognition.onend =null;
+      recognition.stop();
 
-  // ── Override appendMsg to speak AI replies ──
-  const _originalAppendMsg = appendMsg;
-  // Patch sendMessage to speak AI reply
-  const _originalSendMessage = sendMessage;
-  sendMessage = async function() {
-    stopSpeaking();
-    stopRecording();
-    await _originalSendMessage.apply(this, arguments);
-  };
+    }
+    document.getElementById('micBtn').classList.remove('recording');
+    document.getElementById('msgInput').placeholder = "Type your answer here ...";
+
+  }
+      
+
+  
+
+  
 
   // Speak welcome message on load
   setTimeout(() => {

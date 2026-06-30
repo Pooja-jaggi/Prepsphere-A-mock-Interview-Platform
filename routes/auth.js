@@ -60,7 +60,51 @@ router.post('/set-password', async (req, res) => {
     req.session.tempUser = null;
     res.redirect('/login');
 });
+router.get('/forgot-password', (req,res) =>{
+    res.render('forgot-password');
+});
+router.post('/forgot-password', async (req, res) =>{
+    const {email} =req.body;
+    const user =db.prepare('SELECT * FROM users WHERE email=?').get(email);
+    if(!user)return res.send("NO account found with that email");
 
+    const code = Math.floor(100000 + Math.random()* 900000).toString();
+    req.session.resetCode = code;
+    req.session.resetEmail =email;
+    
+    try{
+        await sendVerificationCode(email, code);
+        res.redirect('/reset-password');
+
+    }catch(err){
+        console.error(err);
+        res.send('Failed to send email.Check you .env')
+    }
+})
+router.get('/reset-password',(req,res)=>{
+    res.render('reset-password',{error:req.query.error || null
+
+    });
+});
+router.post('/reset-password', async (req,res)=>{
+    const {code, password ,confirmpassword}=req.body;
+
+    if(code!=req.session.resetCode){
+        return res.redirect('/reset-password?error=invalidcode');
+
+    }
+    if (password != confirmpassword){
+        return res.redirect('/reset-password?error=nomatch');
+
+    }
+    const hashedPassword=await bcrypt.hash(password,10);
+    db.prepare('UPDATE users SET password =? WHERE email=?')
+    .run(hashedPassword, req.session.resetEmail);
+    req.session.resetCode = null;
+    req.session.resetEmail =null;
+    res.redirect('/login');
+
+});
 router.get('/login', (req, res) => {
     res.render('login',{error:req.query.error ||null});
 });
