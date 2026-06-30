@@ -103,8 +103,8 @@ router.post('/reset-password', async (req,res)=>{
     req.session.resetCode = null;
     req.session.resetEmail =null;
     res.redirect('/login');
-hhhhh
-});yjuyufiuikugiu
+
+});
 router.get('/login', (req, res) => {
     res.render('login',{error:req.query.error ||null});
 });
