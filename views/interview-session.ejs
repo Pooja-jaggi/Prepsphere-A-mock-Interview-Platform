@@ -1207,10 +1207,15 @@
   let recognition = null;
   let isRecording = false;
   let finalTranscript ='';
+  let userEditedManually =false;
+  textarea.addEventListener('input',()=>{
+    if(isReocrding) userEditedManualyy=true;
+  })
 
   function toggleVoice() {
     if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) {
-      alert('Voice input not supported in your browser. Use Chrome for best experience.');
+      alert('Voice input needs Chrome or Edge. It may not work in Brave due to privacy shields blocking Google speech services.');
+
       return;
     }
 
@@ -1222,6 +1227,7 @@
   }
 
   function startRecording() {
+    userEditedManually=false;
     stopSpeaking();
     finalTranscript=document.getElementById('msgInput').value || '';
     const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
@@ -1246,14 +1252,22 @@
           interim += result[0].transcript
         }
       }
+      if(!userEditedManually){
+        const ta=document.getElementById('msgInput');
+        ta.value=finalTranscript+interim;
+        ta.style.height='auto';
+        ta.style.height=Math.min(ta.scrollHeight,120)+'px';
+      }
+    };
       const ta = document.getElementById('msgInput');
       ta.value=finalTranscript + interim;
       ta.style.height='auto';
       ta.style.height = Math.min(ta.scrollHeight, 120)+ 'px';
     };
     recognition.onerror = (e) =>{
+      console.error('STT error:',e.error);
       if(e.error === 'no-speech'){
-        if (isRecording){
+        if(isRecording){
           recognition.stop();
           recognition.start();
         }
