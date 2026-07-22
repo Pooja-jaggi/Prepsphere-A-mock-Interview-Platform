@@ -136,11 +136,11 @@ router.get('/dashboard', isAuthenticated, (req, res) => {
     const avgScore  = scores.length ? Math.round(scores.reduce((a, b) => a + b, 0) / scores.length) : 0;
     const bestScore = scores.length ? Math.max(...scores) : 0;
 
-    // Difficulty breakdown
+    // Difficulty breakdown (nulls default to Medium so old records still show up)
     const difficultyCount = { Easy: 0, Medium: 0, Hard: 0 };
     interviews.forEach(i => {
-        if (i.difficulty && difficultyCount[i.difficulty] !== undefined)
-            difficultyCount[i.difficulty]++;
+        const level = i.difficulty || 'Medium';
+        if (difficultyCount[level] !== undefined) difficultyCount[level]++;
     });
 
     // Mode avg score
@@ -156,14 +156,21 @@ router.get('/dashboard', isAuthenticated, (req, res) => {
         avg: data.total ? Math.round(data.scoreSum / data.total) : 0
     }));
 
-    // Last 7 days
+    // Last 7 days (SQL-driven, avoids JS timezone mismatches between local time and stored UTC timestamps)
+    const dayRows = db.prepare(`
+        SELECT date(created_at) AS day, COUNT(*) AS count
+        FROM interviews
+        WHERE user_id = ? AND date(created_at) >= date('now', '-6 days')
+        GROUP BY day
+    `).all(user.id);
+
+    const countByDay = {};
+    dayRows.forEach(r => { countByDay[r.day] = r.count; });
+
     const last7 = [];
     for (let d = 6; d >= 0; d--) {
-        const date = new Date();
-        date.setDate(date.getDate() - d);
-        const label = date.toISOString().slice(0, 10);
-        const count = interviews.filter(i => i.created_at && i.created_at.startsWith(label)).length;
-        last7.push({ label, count });
+        const label = new Date(Date.now() - d * 86400000).toISOString().slice(0, 10);
+        last7.push({ label, count: countByDay[label] || 0 });
     }
 
     const stats = { total: interviews.length, completed: completed.length, avgScore, bestScore, difficultyCount, modeStats, last7 };

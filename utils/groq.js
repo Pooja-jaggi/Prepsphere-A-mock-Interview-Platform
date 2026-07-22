@@ -120,7 +120,6 @@ Ask the candidate questions about their project one at a time.
 RESPOND STYLE:Be firma nd realistic like an actual company interviewer .NO long paragraphs .Ask question shortly .
 `.trim();
 }
-
 // SEND MESSAGES (with conversation memory)
 async function sendMessage(systemPrompt, conversationHistory, userMessage) {
   const messages = [
